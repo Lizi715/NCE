@@ -58,10 +58,18 @@
     if(!hash){ location.href = 'book.html'; return; }
     const [book, ...rest] = hash.split('/');
     const base = rest.join('/'); // filename
-    const inModern = /\/modern\//.test(location.pathname);
-    const prefix = inModern ? '../' : '';
-    const mp3 = `${prefix}${book}/${base}.mp3`;
-    const lrc = `${prefix}${book}/${base}.lrc`;
+
+    // 使用配置获取正确的资源路径
+    const getResourcePath = (path) => {
+      if (window.NCE_CONFIG && window.NCE_CONFIG.getAssetPath) {
+        return window.NCE_CONFIG.getAssetPath(path);
+      }
+      // 降级方案：使用相对路径
+      return path;
+    };
+
+    const mp3 = getResourcePath(`${book}/${base}.mp3`);
+    const lrc = getResourcePath(`${book}/${base}.lrc`);
 
     const titleEl = qs('#lessonTitle');
     const subEl = qs('#lessonSub');
@@ -414,7 +422,7 @@ function playSegment(i){
     async function resolveLessonNeighbors(){
       try{
         const num = parseInt(book.replace('NCE','')) || 1;
-        const res = await fetch(prefix + 'static/data.json');
+        const res = await fetch(getResourcePath('static/data.json'));
         const data = await res.json();
         const lessons = data[num] || [];
         const i = lessons.findIndex(x => x.filename === base);

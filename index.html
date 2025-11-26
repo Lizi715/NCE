@@ -6,6 +6,7 @@
   <link rel="icon" href="favicon.ico">
   <title>NCE Flow · 课本导航</title>
   <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/config.js"></script>
   <script src="assets/app.js" defer></script>
   <script src="assets/progress.js" defer></script>
   <script defer>
@@ -41,7 +42,10 @@
         }
       }
       async function load(){
-        const res = await fetch('static/data.json');
+        const dataUrl = window.NCE_CONFIG && window.NCE_CONFIG.getAssetPath
+          ? window.NCE_CONFIG.getAssetPath('static/data.json')
+          : 'static/data.json';
+        const res = await fetch(dataUrl);
         const data = await res.json();
         render(data);
       }
